@@ -29,7 +29,9 @@ public class DevilMayCryBattle {
 
     private String elegirPersonaje(Scanner sc) {
         System.out.println("1. Dante\n2. Vergil");
-
+         
+        System.out.println("============================");
+    
         int op = sc.hasNextInt() ? sc.nextInt() : 0;
 
         if (op == 1) return "Dante";
@@ -39,12 +41,16 @@ public class DevilMayCryBattle {
     }
 
     private String elegirEscenario(Scanner sc) {
-        System.out.println("1. Temen-ni-gru\n2. Torre Sparda\n3. Infierno");
+        System.out.println("============================");
+        
+        System.out.println("1. Temen-ni-gru\n2. Torre Sparta\n3. Infierno");
+
+        System.out.println("============================");
 
         int op = sc.hasNextInt() ? sc.nextInt() : 1;
 
         switch (op) {
-            case 2: return "Torre Sparda";
+            case 2: return "Torre Sparta";
             case 3: return "Infierno";
             default: return "Temen-ni-gru";
         }
@@ -57,6 +63,7 @@ public class DevilMayCryBattle {
         } else {
             System.out.println("Vergil: No eres rival para mí, Dante.");
         }
+        System.out.println("============================");
     }
 
     private void pelea(String p, String o, Scanner sc) {
@@ -136,6 +143,7 @@ public class DevilMayCryBattle {
             System.out.println(o + " ganó");
         else
             System.out.println(p + " ganó");
+        
     }
 
     private int rand(int min, int max) {
