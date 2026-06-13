@@ -1,5 +1,6 @@
 package tercera_unidad.ExamenFinal.View;
 
+import tercera_unidad.ExamenFinal.Model.Producto;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -10,7 +11,7 @@ public class VentanaPrincipal extends JFrame {
     public JTextField txtCedula;
     public JTextField txtCantidad;
 
-    public JComboBox<String> comboProductos;
+    public JComboBox<Producto> comboProductos;
 
     public JButton btnAgregar;
     public JButton btnEliminar;
@@ -61,11 +62,21 @@ public class VentanaPrincipal extends JFrame {
         panelProducto.setBorder(BorderFactory.createTitledBorder("Agregar Producto"));
 
         comboProductos = new JComboBox<>();
-        comboProductos.addItem("Arroz");
-        comboProductos.addItem("Leche");
-        comboProductos.addItem("Aceite");
-        comboProductos.addItem("Azucar");
-        comboProductos.addItem("Huevos");
+
+        comboProductos.addItem(
+        new Producto("P001","Arroz",2500,100));
+
+        comboProductos.addItem(
+        new Producto("P002","Leche",4000,50));
+
+        comboProductos.addItem(
+        new Producto("P003","Aceite",12000,30));
+
+        comboProductos.addItem(
+        new Producto("P004","Azucar",3000,80));
+
+        comboProductos.addItem(
+        new Producto("P005","Huevos",18000,20));
 
         txtCantidad = new JTextField(5);
 
@@ -138,37 +149,85 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void agregarProducto() {
-        try {
-            String producto = comboProductos.getSelectedItem().toString();
-            int cantidad = Integer.parseInt(txtCantidad.getText());
 
-            double precio = switch (producto) {
-                case "Arroz" -> 2500;
-                case "Leche" -> 4000;
-                case "Aceite" -> 12000;
-                case "Azucar" -> 3000;
-                default -> 18000;
-            };
+    try {
 
-            double subtotal = precio * cantidad;
-
-            modelo.addRow(new Object[]{
-                    "P" + (modelo.getRowCount()+1),
-                    producto,
-                    precio,
-                    cantidad,
-                    subtotal
-            });
-
-            totalAcumulado += subtotal;
-            actualizarTotales();
-            txtCantidad.setText("");
-
-        } catch(Exception ex) {
-            JOptionPane.showMessageDialog(this,"Cantidad inválida");
+        if(txtCliente.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ingrese el nombre del cliente");
+            return;
         }
-    }
 
+        if(txtCedula.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ingrese la cédula");
+            return;
+        }
+
+        if(txtCantidad.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ingrese la cantidad");
+            return;
+        }
+
+        Producto producto =
+                (Producto) comboProductos.getSelectedItem();
+
+        int cantidad =
+                Integer.parseInt(txtCantidad.getText());
+
+        if(cantidad <= 0) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "La cantidad debe ser mayor que cero");
+            return;
+        }
+
+        if(cantidad > producto.getStock()) {
+
+    JOptionPane.showMessageDialog(
+            this,
+            "No hay suficientes unidades de "
+            + producto.getNombre()
+            + ".\nStock disponible: "
+            + producto.getStock(),
+            "Stock insuficiente",
+            JOptionPane.WARNING_MESSAGE
+    );
+
+    return;
+}
+
+        double precio = producto.getPrecio();
+        double subtotal = precio * cantidad;
+
+        modelo.addRow(new Object[]{
+                producto.getCodigo(),
+                producto.getNombre(),
+                precio,
+                cantidad,
+                subtotal
+        });
+
+        producto.disminuirStock(cantidad);
+
+        totalAcumulado += subtotal;
+
+        actualizarTotales();
+
+        txtCantidad.setText("");
+
+    } catch(NumberFormatException ex) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "La cantidad debe contener solo números");
+    }
+}
+ 
     private void eliminarProducto() {
         int fila = tabla.getSelectedRow();
 
@@ -193,14 +252,36 @@ public class VentanaPrincipal extends JFrame {
         actualizarTotales();
     }
 
-    private void facturar() {
-        JOptionPane.showMessageDialog(this,
-                "===== FACTURA =====\n\n" +
-                "Cliente: " + txtCliente.getText() +
-                "\nCedula: " + txtCedula.getText() +
-                "\n\n" +
-                lblTotal.getText());
+   private void facturar() {
+
+    if(txtCliente.getText().trim().isEmpty()
+            || txtCedula.getText().trim().isEmpty()) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Debe ingresar los datos del cliente"
+        );
+
+        return;
     }
+
+    if(modelo.getRowCount() == 0) {
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Debe agregar al menos un producto antes de facturar"
+        );
+
+        return;
+    }
+
+    JOptionPane.showMessageDialog(this,
+            "===== FACTURA =====\n\n" +
+            "Cliente: " + txtCliente.getText() +
+            "\nCedula: " + txtCedula.getText() +
+            "\n\n" +
+            lblTotal.getText());
+}
 
     private void actualizarTotales() {
 
